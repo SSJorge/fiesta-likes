@@ -14,51 +14,50 @@ service cloud.firestore {
         );
     }
 
-    // =========================
-    // ADMIN
-    // =========================
+    // ===============================
+    // ADMINISTRADORES
+    // ===============================
 
     match /admins/{uid} {
-      allow read: if signedIn()
+      allow get: if signedIn()
         && request.auth.uid == uid;
 
-      allow write: if false;
+      allow list, create, update, delete: if false;
     }
 
-    // =========================
-    // LOGIN ALIASES
-    // =========================
+    // ===============================
+    // NOMBRE -> EMAIL INTERNO
+    // ===============================
 
     match /loginAliases/{loginKey} {
-      // Necesario para convertir:
-      // "Jorge" -> email interno
-      allow read: if true;
+      // El usuario todavía no está autenticado
+      // cuando necesita averiguar su email interno.
+      allow get: if true;
 
-      allow write: if false;
+      allow list, create, update, delete: if false;
     }
 
-    // =========================
-    // PERFILES
-    // =========================
+    // ===============================
+    // PERFILES PÚBLICOS
+    // ===============================
 
     match /profiles/{uid} {
       allow read: if signedIn();
 
-      // Los crea Cloud Functions.
-      allow write: if false;
+      // Se crean mediante Cloud Functions.
+      allow create, update, delete: if false;
     }
 
-    // =========================
+    // ===============================
     // LIKES ACTUALES
-    // =========================
+    // ===============================
 
     match /likes/{likeId} {
 
       allow read: if isAdmin()
         || (
           signedIn()
-          && resource.data.fromUid
-              == request.auth.uid
+          && resource.data.fromUid == request.auth.uid
         );
 
       allow create: if signedIn()
@@ -70,36 +69,34 @@ service cloud.firestore {
         ])
 
         && request.resource.data.fromUid
-            == request.auth.uid
+          == request.auth.uid
+
+        && request.resource.data.targetUid is string
 
         && request.resource.data.targetUid
-            != request.auth.uid
-
-        && request.resource.data.targetUid
-            is string
-
-        && exists(
-          /databases/$(database)/documents/profiles/$(request.resource.data.targetUid)
-        )
+          != request.auth.uid
 
         && likeId ==
           request.auth.uid
           + '_'
           + request.resource.data.targetUid
 
+        && exists(
+          /databases/$(database)/documents/profiles/$(request.resource.data.targetUid)
+        )
+
         && request.resource.data.createdAt
-            == request.time;
+          == request.time;
 
       allow update: if false;
 
       allow delete: if signedIn()
-        && resource.data.fromUid
-            == request.auth.uid;
+        && resource.data.fromUid == request.auth.uid;
     }
 
-    // =========================
+    // ===============================
     // HISTORIAL
-    // =========================
+    // ===============================
 
     match /likeEvents/{eventId} {
 
@@ -115,10 +112,12 @@ service cloud.firestore {
         ])
 
         && request.resource.data.fromUid
-            == request.auth.uid
+          == request.auth.uid
+
+        && request.resource.data.targetUid is string
 
         && request.resource.data.targetUid
-            != request.auth.uid
+          != request.auth.uid
 
         && (
           request.resource.data.action == 'like'
@@ -126,7 +125,7 @@ service cloud.firestore {
         )
 
         && request.resource.data.createdAt
-            == request.time;
+          == request.time;
 
       allow update, delete: if false;
     }
