@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656609955095",
+    "project_id": "fiesta-likes",
+    "storage_bucket": "fiesta-likes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656609955095:android:bacbb493d461479dc6fb52",
+        "android_client_info": {
+          "package_name": "com.example.fiesta_likes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz5HatvoKnsYReO6K5mqaHNn0bfupx068"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
